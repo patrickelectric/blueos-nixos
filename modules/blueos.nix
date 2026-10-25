@@ -67,6 +67,8 @@ in
   services.nginx = {
     enable = true;
     config = nginxConf;
+    # gixy rejects the BlueOS config
+    validateConfigFile = false;
   };
   systemd.tmpfiles.rules = [ "d /var/lib/blueos/nginx-extensions 0755 root root -" ];
 
