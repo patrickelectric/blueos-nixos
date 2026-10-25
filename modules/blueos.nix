@@ -72,9 +72,10 @@ in
 
   hardware.i2c.enable = true;
   boot.kernelModules = [ "i2c-dev" "i2c-bcm2835" "bcm2835-v4l2" "dwc2" "g_ether" ];
-  services.udev.extraRules =
-    builtins.readFile "${blueos}/install/udev/100.autopilot.rules"
-    + builtins.readFile "${blueos}/install/udev/110.usb-power.rules";
+  # install/udev/110.usb-power.rules is not in the 1.4.7 tag yet
+  services.udev.extraRules = builtins.readFile "${blueos}/install/udev/100.autopilot.rules" + ''
+    ACTION=="add", SUBSYSTEM=="usb", TEST=="power/control", ATTR{power/control}="on"
+  '';
 
   # nixos-raspberrypi puts a console on serial0, which the Navigator uses.
   # mkForce because list options merge.
