@@ -1,7 +1,4 @@
-on:
-  push:
-    branches: [master]
-    tags: ["v*"]
+on: push
 jobs:
   image:
     runs-on: ubuntu-24.04-arm
@@ -20,6 +17,7 @@ jobs:
         with:
           name: blueos
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+          skipPush: ${{ secrets.CACHIX_AUTH_TOKEN == '' }}
       - run: nix build .#nixosConfigurations.blueos-${{ matrix.board }}.config.system.build.toplevel -o toplevel
       - run: nix build .#nixosConfigurations.blueos-${{ matrix.board }}.config.system.build.sdImage -o image
       - uses: softprops/action-gh-release@v3
