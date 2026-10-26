@@ -1,5 +1,5 @@
 # Release binaries, same versions as core/tools/*/bootstrap.sh at BlueOS 1.4.7
-{ stdenv, fetchurl, autoPatchelfHook }:
+{ stdenv, fetchurl, autoPatchelfHook, udev }:
 let
   bin = name: url: sha256: {
     inherit name;
@@ -24,7 +24,7 @@ stdenv.mkDerivation {
   dontUnpack = true;
   # linux2rest is glibc dynamic, the others are static
   nativeBuildInputs = [ autoPatchelfHook ];
-  buildInputs = [ stdenv.cc.cc.lib ];
+  buildInputs = [ stdenv.cc.cc.lib udev ];
   installPhase = ''
     mkdir -p $out/bin
     ${builtins.concatStringsSep "\n" (map (b: "install -m755 ${b.src} $out/bin/${b.name}") bins)}
