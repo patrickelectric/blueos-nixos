@@ -10,7 +10,7 @@
   pyproject-build-systems,
 }:
 let
-  workspace = uv2nix.lib.workspace.loadWorkspace { workspaceRoot = /. + "${blueos}/core"; };
+  workspace = uv2nix.lib.workspace.loadWorkspace { workspaceRoot = blueos + "/core"; };
 
   overlay = workspace.mkPyprojectOverlay { sourcePreference = "wheel"; };
 
