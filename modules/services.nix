@@ -63,7 +63,8 @@ let
       wantedBy = [ "blueos.target" ];
       partOf = [ "blueos.target" ];
       after = [ "network.target" ];
-      inherit path;
+      # units only get coreutils by default, the services call tools from the system profile
+      path = [ "/run/current-system/sw" ] ++ path;
       environment = {
         MAV_SYSTEM_ID = "1";
         MAV_COMPONENT_ID_ONBOARD_COMPUTER4 = "194";
