@@ -10,7 +10,7 @@
 
   inputs = {
     nixos-raspberrypi.url = "github:nvmd/nixos-raspberrypi/28a5affc20c4a73f94af582432f4dfd179b038fe";
-    blueos = {
+    blueos-src = {
       url = "github:bluerobotics/BlueOS/1.4.7";
       flake = false;
     };
