@@ -104,5 +104,8 @@ in
         ${blueos}/install/overlays/spi0-led.dts
     '';
 
+  # ardupilot_manager downloads glibc dynamic ArduSub binaries at runtime
+  programs.nix-ld.enable = true;
+
   system.stateVersion = "25.11";
 }
