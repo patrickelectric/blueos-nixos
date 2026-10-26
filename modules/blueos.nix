@@ -104,6 +104,16 @@ in
         ${blueos}/install/overlays/spi0-led.dts
     '';
 
+  # core/start-blueos-core tune_performance
+  boot.kernel.sysctl = {
+    "net.core.wmem_max" = 16777216;
+    "net.core.rmem_max" = 16777216;
+    "net.core.wmem_default" = 1048576;
+    "net.core.rmem_default" = 1048576;
+    "net.core.netdev_max_backlog" = 5000;
+    "vm.swappiness" = 10;
+  };
+
   # ardupilot_manager downloads glibc dynamic ArduSub binaries at runtime
   programs.nix-ld.enable = true;
 
