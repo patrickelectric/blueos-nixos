@@ -28,6 +28,7 @@
             nixos-raspberrypi.nixosModules.sd-image
             ./boards/pi${board}.nix
             ./modules/blueos.nix
+            ./modules/services.nix
           ];
         };
     in
