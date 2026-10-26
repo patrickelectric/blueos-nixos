@@ -16,18 +16,18 @@ let
 
   # uv.lock has no wheel for these, so they build from sdist
   setuptools =
-    final: name:
-    final.${name}.overrideAttrs (old: {
+    final: prev: name:
+    prev.${name}.overrideAttrs (old: {
       nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ final.resolveBuildSystem { setuptools = [ ]; };
     });
 
   overrides = final: prev: {
-    aiohttp = setuptools final "aiohttp";
-    psutil = setuptools final "psutil";
-    pyrsistent = setuptools final "pyrsistent";
-    python-multipart = setuptools final "python-multipart";
-    smbus2 = setuptools final "smbus2";
-    pydantic = setuptools final "pydantic";
+    aiohttp = setuptools final prev "aiohttp";
+    psutil = setuptools final prev "psutil";
+    pyrsistent = setuptools final prev "pyrsistent";
+    python-multipart = setuptools final prev "python-multipart";
+    smbus2 = setuptools final prev "smbus2";
+    pydantic = setuptools final prev "pydantic";
     sdbus = prev.sdbus.overrideAttrs (old: {
       buildInputs = (old.buildInputs or [ ]) ++ [ systemd ];
     });
