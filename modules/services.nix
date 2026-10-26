@@ -19,6 +19,22 @@ let
       ;
   };
   python = name: args: "${venv}/bin/python ${blueos}/core/services/${name}/main.py ${args}";
+
+  mcm = pkgs.callPackage ../pkgs/mavlink-camera-manager.nix { };
+  # nothing wraps a foreign binary, so it needs to be told where the plugins are
+  gstPlugins = lib.makeSearchPathOutput "lib" "lib/gstreamer-1.0" (
+    with pkgs.gst_all_1;
+    [
+      gstreamer
+      gst-plugins-base
+      gst-plugins-good
+      gst-plugins-bad
+      gst-plugins-ugly
+      gst-libav
+      gst-plugins-rs
+      pkgs.libcamera
+    ]
+  );
   zenoh = pkgs.callPackage ../pkgs/zenoh.nix { };
 
   # core/tools/zenoh/blueos-zenoh.json5 plus where to find the rest plugin
@@ -40,6 +56,7 @@ let
       user ? "root",
       path ? [ ],
       preStart ? "",
+      environment ? { },
     }:
     {
       description = "BlueOS ${name}";
@@ -51,7 +68,8 @@ let
         MAV_SYSTEM_ID = "1";
         MAV_COMPONENT_ID_ONBOARD_COMPUTER4 = "194";
         RUST_BACKTRACE = "1";
-      };
+      }
+      // environment;
       preStart = "mkdir -p ${logs}/${name}\n" + preStart;
       serviceConfig = {
         ExecStart = exec;
@@ -98,6 +116,11 @@ in
     ardupilot-manager = service "autopilot" {
       nice = -19;
       exec = python "ardupilot_manager" "";
+    };
+    video = service "video" {
+      nice = -19;
+      environment.GST_PLUGIN_SYSTEM_PATH_1_0 = gstPlugins;
+      exec = "${mcm}/bin/mavlink-camera-manager --default-settings BlueROVUDP --mavlink tcpout:127.0.0.1:5777 --mavlink-system-id 1 --mavlink-camera-component-id-range=100-105 --gst-feature-rank omxh264enc=0,v4l2h264enc=250,x264enc=260 --log-path ${logs}/mavlink-camera-manager --stun-server stun://stun.l.google.com:19302 --enable-realtime-threads --verbose";
     };
     cable-guy = service "cable_guy" {
       exec = python "cable_guy" "";
