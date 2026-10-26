@@ -24,6 +24,7 @@ let
   overrides = final: prev: {
     aiohttp = setuptools final prev "aiohttp";
     psutil = setuptools final prev "psutil";
+    pykson = setuptools final prev "pykson";
     pyrsistent = setuptools final prev "pyrsistent";
     python-multipart = setuptools final prev "python-multipart";
     smbus2 = setuptools final prev "smbus2";
