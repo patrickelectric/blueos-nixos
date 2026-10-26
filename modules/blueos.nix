@@ -37,7 +37,10 @@ in
   _module.args.blueos = pkgs.applyPatches {
     name = "blueos-src";
     src = blueos-src;
-    patches = [ ../patches/helper-nginx-paths.patch ];
+    patches = [
+      ../patches/helper-nginx-paths.patch
+      ../patches/cable-guy-dhcpcd.patch
+    ];
   };
 
   networking.hostName = "blueos";
@@ -94,11 +97,25 @@ in
     value = true;
   };
 
+  # What the services shell out to
+  environment.systemPackages = with pkgs; [
+    dhcpcd
+    dnsmasq
+    iw
+    ifmetric
+    iproute2
+    util-linux
+    libraspberrypi
+    i2c-tools
+    tmux
+  ];
+
   hardware.i2c.enable = true;
-  boot.kernelModules = [ "i2c-dev" "i2c-bcm2835" "bcm2835-v4l2" "dwc2" "g_ether" ];
+  boot.kernelModules = [ "i2c-dev" "i2c-bcm2835" "bcm2835-v4l2" "dwc2" "g_ether" "slcan" ];
   # install/udev/110.usb-power.rules is not in the 1.4.7 tag yet
   services.udev.extraRules = builtins.readFile "${blueos}/install/udev/100.autopilot.rules" + ''
     ACTION=="add", SUBSYSTEM=="usb", TEST=="power/control", ATTR{power/control}="on"
+    SUBSYSTEM=="vchiq|vcio|vc-mem", GROUP="video", MODE="0660"
   '';
 
   # nixos-raspberrypi puts a console on serial0, which the Navigator uses.
