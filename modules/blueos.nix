@@ -72,6 +72,12 @@ in
   };
   systemd.tmpfiles.rules = [ "d /var/lib/blueos/nginx-extensions 0755 root root -" ];
 
+  # Raspberry Pi OS ships this in its default config.txt, nixos-raspberrypi does not
+  hardware.raspberry-pi.config.all.options.camera_auto_detect = {
+    enable = true;
+    value = true;
+  };
+
   hardware.i2c.enable = true;
   boot.kernelModules = [ "i2c-dev" "i2c-bcm2835" "bcm2835-v4l2" "dwc2" "g_ether" ];
   # install/udev/110.usb-power.rules is not in the 1.4.7 tag yet
