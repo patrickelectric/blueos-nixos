@@ -1,7 +1,24 @@
 # core/start-blueos-core at BlueOS 1.4.7, one unit per service
-{ lib, pkgs, ... }:
+{
+  lib,
+  pkgs,
+  blueos,
+  uv2nix,
+  pyproject-nix,
+  pyproject-build-systems,
+  ...
+}:
 let
   tools = pkgs.callPackage ../pkgs/blueos-tools.nix { };
+  venv = pkgs.callPackage ../pkgs/blueos-core.nix {
+    inherit
+      blueos
+      uv2nix
+      pyproject-nix
+      pyproject-build-systems
+      ;
+  };
+  python = name: args: "${venv}/bin/python ${blueos}/core/services/${name}/main.py ${args}";
   zenoh = pkgs.callPackage ../pkgs/zenoh.nix { };
 
   # core/tools/zenoh/blueos-zenoh.json5 plus where to find the rest plugin
@@ -20,6 +37,7 @@ let
       exec,
       memoryMax ? null,
       nice ? 0,
+      user ? "root",
       path ? [ ],
       preStart ? "",
     }:
@@ -40,12 +58,21 @@ let
         Restart = "always";
         RestartSec = 1;
         Nice = nice;
+        User = user;
         WorkingDirectory = "/";
       }
       // lib.optionalAttrs (memoryMax != null) { MemoryMax = "${toString memoryMax}M"; };
     };
 in
 {
+  # bridget and ping run unprivileged in the docker image too
+  users.users.blueos = {
+    isSystemUser = true;
+    group = "blueos";
+    extraGroups = [ "dialout" ];
+  };
+  users.groups.blueos = { };
+
   systemd.targets.blueos = {
     description = "BlueOS";
     wantedBy = [ "multi-user.target" ];
@@ -66,6 +93,63 @@ in
       before = [ "blueos.target" ];
       serviceConfig.Type = "oneshot";
       script = "${tools}/bin/machineid-cli --key blueos --parts cpu-cores cpuid mac-address > /etc/blueos/hardware-uuid";
+    };
+
+    ardupilot-manager = service "autopilot" {
+      nice = -19;
+      exec = python "ardupilot_manager" "";
+    };
+    cable-guy = service "cable_guy" {
+      exec = python "cable_guy" "";
+    };
+    kraken = service "kraken" {
+      nice = 19;
+      exec = python "kraken" "";
+    };
+    wifi = service "wifi" {
+      nice = 19;
+      exec = python "wifi" "--socket wlan0";
+    };
+    beacon = service "beacon" {
+      memoryMax = 250;
+      exec = python "beacon" "";
+    };
+    bridget = service "bridget" {
+      nice = 19;
+      user = "blueos";
+      exec = python "bridget" "";
+    };
+    commander = service "commander" {
+      memoryMax = 250;
+      exec = python "commander" "";
+    };
+    nmea-injector = service "nmea_injector" {
+      memoryMax = 250;
+      nice = 19;
+      exec = python "nmea_injector" "";
+    };
+    helper = service "helper" {
+      memoryMax = 250;
+      exec = python "helper" "";
+    };
+    pardal = service "pardal" {
+      memoryMax = 250;
+      nice = 19;
+      exec = python "pardal" "";
+    };
+    ping = service "ping" {
+      nice = 19;
+      user = "blueos";
+      exec = python "ping" "";
+    };
+    log-zipper = service "log_zipper" {
+      memoryMax = 250;
+      nice = 19;
+      exec = python "log_zipper" "'/shortcuts/system_logs/**/*.log' --max-age-minutes 60";
+    };
+    bag-of-holding = service "bag_of_holding" {
+      memoryMax = 250;
+      exec = python "bag_of_holding" "";
     };
 
     zenohd = service "zenohd" {
