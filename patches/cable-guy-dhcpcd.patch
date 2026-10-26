@@ -1,0 +1,20 @@
+--- a/core/services/cable_guy/networksetup.py
++++ b/core/services/cable_guy/networksetup.py
+@@ -122,7 +122,7 @@
+         """
+         try:
+             # Just run dhclient without releasing existing IPs
+-            command = f"timeout 5 dhclient -d -v {interface_name} 2>&1 || echo 'timeout'"
++            command = f"timeout 5 dhcpcd -B -4 -1 -t 5 {interface_name} 2>&1 || echo 'timeout'"
+             logger.info(f"Running: {command}")
+             dhclient_output = os.popen(command).read()
+ 
+@@ -131,7 +131,7 @@
+                 logger.info(f"dhclient timed out for interface {interface_name}.")
+                 return None
+ 
+-            bound_ip_match = re.search(r"bound to ([0-9.]+)", dhclient_output)
++            bound_ip_match = re.search(r"leased ([0-9.]+)", dhclient_output)
+             if bound_ip_match:
+                 logger.info(f"Got new IP {bound_ip_match.group(1)} from DHCP for {interface_name}")
+                 return bound_ip_match.group(1)
