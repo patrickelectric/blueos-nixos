@@ -21,6 +21,7 @@ jobs:
           name: blueos
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - run: nix build .#nixosConfigurations.blueos-${{ matrix.board }}.config.system.build.toplevel -o toplevel
+      - run: nix path-info -rsS ./toplevel | sort -k2 -n | tail -40
       - run: nix build .#nixosConfigurations.blueos-${{ matrix.board }}.config.system.build.sdImage -o image
       - uses: actions/upload-artifact@v7
         with:
