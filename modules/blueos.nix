@@ -1,4 +1,11 @@
-{ lib, pkgs, blueos, nixos-raspberrypi, ... }:
+{
+  lib,
+  pkgs,
+  blueos,
+  blueos-src,
+  nixos-raspberrypi,
+  ...
+}:
 let
   frontend = pkgs.callPackage ../pkgs/blueos-frontend.nix { };
 
@@ -26,6 +33,13 @@ let
   firmware = nixos-raspberrypi.packages.${pkgs.stdenv.hostPlatform.system}.raspberrypifw;
 in
 {
+  # Paths that only exist inside the docker image
+  _module.args.blueos = pkgs.applyPatches {
+    name = "blueos-src";
+    src = blueos-src;
+    patches = [ ../patches/helper-nginx-paths.patch ];
+  };
+
   networking.hostName = "blueos";
 
   # cable_guy needs NetworkManager on D-Bus but configures eth0 and usb0 itself
@@ -64,6 +78,8 @@ in
   # Docker is only here for extensions, nginx proxies /docker/ to the socket
   virtualisation.docker.enable = true;
   users.users.nginx.extraGroups = [ "docker" ];
+  # helper reads it to map ports to services
+  environment.etc."blueos/nginx.conf".text = nginxConf;
   services.nginx = {
     enable = true;
     config = nginxConf;
