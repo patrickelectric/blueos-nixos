@@ -51,6 +51,11 @@ in
     dns = "none";
     unmanaged = [ "interface:eth0" "interface:usb0" ];
   };
+  # cable_guy runs its own dhcpcd on eth0, the system one would fight it
+  networking.interfaces.eth0 = {
+    useDHCP = false;
+    ipv4.addresses = [ { address = "192.168.2.2"; prefixLength = 24; } ];
+  };
   # grabs the autopilot serial ports
   networking.modemmanager.enable = false;
 
