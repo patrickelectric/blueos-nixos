@@ -117,8 +117,9 @@ in
 
     ardupilot-manager = service "autopilot" {
       nice = -19;
-      # FirmwareUpload calls the uploader and apj_tool by name, FirmwareInstall imports the decoder
-      path = [ ardupilotTools ];
+      # FirmwareUpload calls the uploader and apj_tool by name, FirmwareInstall imports the decoder,
+      # MavlinkManager looks for mavlink-server
+      path = [ ardupilotTools tools ];
       environment.PYTHONPATH = "${ardupilotTools}/lib/python";
       exec = python "ardupilot_manager" "";
     };
