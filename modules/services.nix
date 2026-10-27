@@ -20,6 +20,12 @@ let
   };
   python = name: args: "${venv}/bin/python ${blueos}/core/services/${name}/main.py ${args}";
   ardupilotTools = pkgs.callPackage ../pkgs/ardupilot-tools.nix { python = venv; };
+  # core/tools/ardupilot_tools/bootstrap.sh, the manager copies it on a Navigator that has no firmware yet
+  navigatorFirmware = pkgs.fetchurl {
+    url = "https://firmware.ardupilot.org/Sub/stable-4.5.3/navigator64/ardusub";
+    hash = "sha256-XcvaskElXN8BX6ZUbutsTKK0AROAJxD9sACqaI41NFE=";
+    executable = true;
+  };
 
   mcm = pkgs.callPackage ../pkgs/mavlink-camera-manager.nix { };
   # nothing wraps a foreign binary, so it needs to be told where the plugins are
@@ -105,6 +111,8 @@ in
     "d /etc/filebrowser 0755 root root -"
     "d /shortcuts 0755 root root -"
     "L /shortcuts/system_logs - - - - ${logs}"
+    # a copy, the manager chmods the file before installing it
+    "C+ /root/blueos-files/ardupilot-manager/default/ardupilot_navigator64 - - - - ${navigatorFirmware}"
   ];
 
   systemd.services = {
