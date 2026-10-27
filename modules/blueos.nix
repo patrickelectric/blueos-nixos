@@ -173,6 +173,7 @@ in
     vfat = true;
     ext4 = true;
   };
+  documentation.enable = false;
 
   system.stateVersion = "25.11";
 }
