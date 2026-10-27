@@ -40,6 +40,7 @@ in
     patches = [
       ../patches/helper-nginx-paths.patch
       ../patches/cable-guy-dhcpcd.patch
+      ../patches/navigator-arch-detect.patch
     ];
   };
 
