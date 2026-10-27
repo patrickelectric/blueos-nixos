@@ -79,6 +79,8 @@ in
   };
 
   services.openssh.enable = true;
+  # save_file and upload_file run sudo cp and sudo mv over that ssh session
+  security.sudo.wheelNeedsPassword = false;
   users.users.pi = {
     isNormalUser = true;
     initialPassword = "raspberry";
