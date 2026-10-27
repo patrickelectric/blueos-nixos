@@ -179,6 +179,8 @@ in
     ext4 = true;
   };
   documentation.enable = false;
+  # a generation keeps under 80 MB of kernel and initrd there, 1 GB is too much
+  sdImage.firmwareSize = 512;
 
   system.stateVersion = "25.11";
 }
