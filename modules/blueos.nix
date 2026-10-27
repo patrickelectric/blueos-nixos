@@ -162,5 +162,9 @@ in
   # ardupilot_manager downloads glibc dynamic ArduSub binaries at runtime
   programs.nix-ld.enable = true;
 
+  # linux-firmware is 800 MB, the Pi only needs its own wireless blobs
+  hardware.enableRedistributableFirmware = lib.mkForce false;
+  hardware.firmware = [ pkgs.raspberrypiWirelessFirmware ];
+
   system.stateVersion = "25.11";
 }
