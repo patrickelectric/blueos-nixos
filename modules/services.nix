@@ -65,6 +65,7 @@ let
       path ? [ ],
       preStart ? "",
       environment ? { },
+      serviceConfig ? { },
     }:
     {
       description = "BlueOS ${name}";
@@ -88,7 +89,8 @@ let
         User = user;
         WorkingDirectory = "/";
       }
-      // lib.optionalAttrs (memoryMax != null) { MemoryMax = "${toString memoryMax}M"; };
+      // lib.optionalAttrs (memoryMax != null) { MemoryMax = "${toString memoryMax}M"; }
+      // serviceConfig;
     };
 in
 {
@@ -114,6 +116,9 @@ in
     "L /shortcuts/system_logs - - - - ${logs}"
     # a copy, the manager chmods the file before installing it
     "C+ /root/blueos-files/ardupilot-manager/default/ardupilot_navigator64 - - - - ${navigatorFirmware}"
+    # ArduSub reads soc/ranges to tell the Pi model, this kernel names the node soc@107c000000
+    "C /run/blueos/device-tree - - - - /sys/firmware/devicetree/base"
+    "L /run/blueos/device-tree/soc - - - - soc@107c000000"
   ];
 
   systemd.services = {
@@ -134,6 +139,8 @@ in
         # the ArduSub binaries are glibc dynamic, units do not get the session variables nix-ld reads
         inherit (config.environment.variables) NIX_LD NIX_LD_LIBRARY_PATH;
       };
+      # shortcut: fakes the soc node name for ArduSub, drop when ArduPilot's Util_RPI accepts soc@ nodes
+      serviceConfig.BindReadOnlyPaths = [ "/run/blueos/device-tree:/sys/firmware/devicetree/base" ];
       exec = python "ardupilot_manager" "";
     };
     video = service "video" {
