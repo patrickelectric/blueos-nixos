@@ -44,6 +44,8 @@ in
   };
 
   networking.hostName = "blueos";
+  # BlueOS runs with host networking and no firewall, extensions open their own ports
+  networking.firewall.enable = false;
 
   # cable_guy needs NetworkManager on D-Bus but configures eth0 and usb0 itself
   networking.networkmanager = {
