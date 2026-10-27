@@ -19,6 +19,7 @@ let
       ;
   };
   python = name: args: "${venv}/bin/python ${blueos}/core/services/${name}/main.py ${args}";
+  ardupilotTools = pkgs.callPackage ../pkgs/ardupilot-tools.nix { python = venv; };
 
   mcm = pkgs.callPackage ../pkgs/mavlink-camera-manager.nix { };
   # nothing wraps a foreign binary, so it needs to be told where the plugins are
@@ -116,6 +117,9 @@ in
 
     ardupilot-manager = service "autopilot" {
       nice = -19;
+      # FirmwareUpload calls the uploader and apj_tool by name, FirmwareInstall imports the decoder
+      path = [ ardupilotTools ];
+      environment.PYTHONPATH = "${ardupilotTools}/lib/python";
       exec = python "ardupilot_manager" "";
     };
     video = service "video" {
