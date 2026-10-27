@@ -168,6 +168,11 @@ in
   # the registry pin puts the whole nixpkgs source in the closure
   nixpkgs.flake.setFlakeRegistry = false;
   nixpkgs.flake.setNixPath = false;
+  # profiles/base.nix brings the tools of every filesystem, zfs alone pulls a python
+  boot.supportedFilesystems = lib.mkForce {
+    vfat = true;
+    ext4 = true;
+  };
 
   system.stateVersion = "25.11";
 }
