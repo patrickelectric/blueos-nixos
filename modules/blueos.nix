@@ -104,8 +104,10 @@ in
     value = true;
   };
 
-  # What the services shell out to
+  # What the services shell out to, commonwealth runs host commands over sshpass ssh pi@localhost
   environment.systemPackages = with pkgs; [
+    sshpass
+    openssh
     dhcpcd
     dnsmasq
     iw
