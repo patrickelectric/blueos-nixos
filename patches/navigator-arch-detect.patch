@@ -1,0 +1,12 @@
+NixOS has no /usr/bin/ls, the running interpreter has the same userland arch
+
+--- a/core/services/ardupilot_manager/flight_controller_detector/linux/navigator.py
++++ b/core/services/ardupilot_manager/flight_controller_detector/linux/navigator.py
+@@ -17,5 +17,5 @@ class Navigator(LinuxFlightController):
+         if platform.machine() == "aarch64":
+             # edge case for 64-bit kernel on 32-bit userland...
+-            # let's check the arch for /usr/bin/ls
+-            with open("/usr/bin/ls", "rb") as f:
++            # let's check the arch of the running interpreter
++            with open("/proc/self/exe", "rb") as f:
+                 elf_file = ELFFile(f)
