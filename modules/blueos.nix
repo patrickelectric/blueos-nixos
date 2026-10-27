@@ -165,6 +165,9 @@ in
   # linux-firmware is 800 MB, the Pi only needs its own wireless blobs
   hardware.enableRedistributableFirmware = lib.mkForce false;
   hardware.firmware = [ pkgs.raspberrypiWirelessFirmware ];
+  # the registry pin puts the whole nixpkgs source in the closure
+  nixpkgs.flake.setFlakeRegistry = false;
+  nixpkgs.flake.setNixPath = false;
 
   system.stateVersion = "25.11";
 }
