@@ -90,6 +90,11 @@ in
 
   # Docker is only here for extensions, nginx proxies /docker/ to the socket
   virtualisation.docker.enable = true;
+  # kraken talks to the socket, the cli plugins are 120 MB
+  virtualisation.docker.package = pkgs.docker.override {
+    buildxSupport = false;
+    composeSupport = false;
+  };
   users.users.nginx.extraGroups = [ "docker" ];
   # helper reads it to map ports to services
   environment.etc."blueos/nginx.conf".text = nginxConf;
