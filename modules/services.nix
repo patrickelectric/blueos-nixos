@@ -1,5 +1,6 @@
 # core/start-blueos-core at BlueOS 1.4.7, one unit per service
 {
+  config,
   lib,
   pkgs,
   blueos,
@@ -128,7 +129,11 @@ in
       # FirmwareUpload calls the uploader and apj_tool by name, FirmwareInstall imports the decoder,
       # MavlinkManager looks for mavlink-server
       path = [ ardupilotTools tools ];
-      environment.PYTHONPATH = "${ardupilotTools}/lib/python";
+      environment = {
+        PYTHONPATH = "${ardupilotTools}/lib/python";
+        # the ArduSub binaries are glibc dynamic, units do not get the session variables nix-ld reads
+        inherit (config.environment.variables) NIX_LD NIX_LD_LIBRARY_PATH;
+      };
       exec = python "ardupilot_manager" "";
     };
     video = service "video" {
