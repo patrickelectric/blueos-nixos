@@ -48,10 +48,10 @@ in
   # BlueOS runs with host networking and no firewall, extensions open their own ports
   networking.firewall.enable = false;
 
-  # cable_guy needs NetworkManager on D-Bus but configures eth0 and usb0 itself
+  # cable_guy needs NetworkManager on D-Bus but configures eth0 and usb0 itself.
+  # Raspberry Pi OS gets its resolver from dhcpcd, here only NetworkManager can write it.
   networking.networkmanager = {
     enable = true;
-    dns = "none";
     unmanaged = [ "interface:eth0" "interface:usb0" ];
   };
   # cable_guy runs its own dhcpcd on eth0, the system one would fight it
